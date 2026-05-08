@@ -237,7 +237,8 @@
                             Focusable="False"
                             IsOpen="{TemplateBinding IsSuggestionListOpen}"
                             Placement="Bottom"
-                            PopupAnimation="Slide">
+                            PopupAnimation="Slide"
+                            StaysOpen="False">
                             <Border
                                 Margin="0"
                                 Padding="0,6,0,6"
