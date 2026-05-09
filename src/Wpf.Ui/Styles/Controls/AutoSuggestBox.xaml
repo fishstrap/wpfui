@@ -34,19 +34,33 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                    <Border
-                        x:Name="ContentBorder"
-                        Margin="4,0,4,0"
-                        Padding="6,10"
-                        BorderBrush="Transparent"
-                        BorderThickness="0"
-                        CornerRadius="6">
-                        <Border.Background>
-                            <SolidColorBrush Opacity="0.0" Color="{DynamicResource SubtleFillColorSecondary}" />
-                        </Border.Background>
-                        <ContentPresenter />
-                    </Border>
+                    <Grid>
+                        <Border 
+                            x:Name="SeparatorLine"
+                            Height="1" 
+                            Margin="10,0,10,0" 
+                            VerticalAlignment="Top" 
+                            Background="{DynamicResource ControlStrokeColorDefaultBrush}" 
+                            Opacity="0.3" />
+
+                        <Border
+                            x:Name="ContentBorder"
+                            Margin="4,0,4,0"
+                            Padding="6,10"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            CornerRadius="6">
+                            <Border.Background>
+                                <SolidColorBrush Opacity="0.0" Color="{DynamicResource SubtleFillColorSecondary}" />
+                            </Border.Background>
+                            <ContentPresenter />
+                        </Border>
+                    </Grid>
+
                     <ControlTemplate.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                            <Setter TargetName="SeparatorLine" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
@@ -162,12 +176,22 @@
                                         Filled="{TemplateBinding IconFilled}"
                                         Foreground="{TemplateBinding IconForeground}"
                                         Symbol="{TemplateBinding Icon}" />
-                                    <Grid Grid.Column="1" Margin="{TemplateBinding Padding}">
-                                        <Decorator
+                                    <Grid Grid.Column="1" Margin="{TemplateBinding Padding}" ClipToBounds="True">
+                                        <ScrollViewer
                                             x:Name="PART_ContentHost"
                                             Margin="0"
+                                            Padding="0"
+                                            Focusable="False"
                                             VerticalAlignment="Center"
-                                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                                            HorizontalScrollBarVisibility="Hidden"
+                                            VerticalScrollBarVisibility="Disabled"
+                                            TextElement.Foreground="{TemplateBinding Foreground}">
+                                            <ScrollViewer.Template>
+                                                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" />
+                                                </ControlTemplate>
+                                            </ScrollViewer.Template>
+                                        </ScrollViewer>
                                         <TextBlock
                                             x:Name="PlaceholderTextBox"
                                             Margin="0"
@@ -229,7 +253,6 @@
                         <Popup
                             x:Name="PART_Popup"
                             Grid.Row="1"
-                            MinWidth="{TemplateBinding ActualWidth}"
                             Margin="0"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
@@ -238,12 +261,15 @@
                             IsOpen="{TemplateBinding IsSuggestionListOpen}"
                             Placement="Bottom"
                             PopupAnimation="Slide"
-                            StaysOpen="False">
+                            StaysOpen="False"
+                            VerticalOffset="2">
                             <Border
+                                x:Name="PopupBorder"
+                                Width="{TemplateBinding ActualWidth}"
                                 Margin="0"
                                 Padding="0,6,0,6"
-                                BorderBrush="{DynamicResource MenuBorderColorDefaultBrush}"
-                                BorderThickness="1"
+                                BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                                BorderThickness="2"
                                 CornerRadius="8"
                                 SnapsToDevicePixels="True">
                                 <Border.Background>
@@ -254,6 +280,7 @@
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                     Margin="0"
                                     Padding="0"
+                                    AlternationCount="9999"
                                     ItemsSource="{TemplateBinding FilteredItemsSource}"
                                     KeyboardNavigation.DirectionalNavigation="Contained"
                                     ScrollViewer.HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
@@ -272,6 +299,9 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger SourceName="PART_SuggestionsPresenter" Property="HasItems" Value="False">
+                            <Setter TargetName="PART_Popup" Property="IsOpen" Value="False" />
+                        </Trigger>
                         <Trigger Property="PlaceholderEnabled" Value="False">
                             <Setter TargetName="PlaceholderTextBox" Property="Visibility" Value="Collapsed" />
                         </Trigger>
